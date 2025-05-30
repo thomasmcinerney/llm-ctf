@@ -134,3 +134,17 @@ class SessionManager:
 
 # Global session manager instance
 session_manager = SessionManager()
+
+# -------------- DUMMY USER DEPENDENCY FOR API AUTH --------------
+from fastapi import HTTPException
+
+class DummyUser:
+    def __init__(self, user_id="demo_user"):
+        self.user_id = user_id
+
+def get_current_user():
+    """
+    Dummy user dependency for development use.
+    In production, replace with a real authentication dependency.
+    """
+    return DummyUser(user_id="demo_user")

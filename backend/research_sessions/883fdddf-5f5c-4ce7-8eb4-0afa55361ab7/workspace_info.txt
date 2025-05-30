@@ -1,0 +1,1 @@
+You are working in a sandboxed environment in /workspace. You have full file and terminal access within this directory only.

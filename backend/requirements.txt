@@ -6,3 +6,6 @@ pydantic-ai[anthropic]
 python-dotenv
 openai
 anthropic
+python-jose
+passlib
+bcrypt

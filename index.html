@@ -5,13 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM Security Research Platform</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <style>
+        .user-session-bar {
+            text-align: right;
+            margin-bottom: 12px;
+        }
+        .user-session-bar .greeting { font-weight: 500; color: #2563eb; }
+        .user-session-bar button, .user-session-bar a {
+            margin-left: 14px;
+            text-decoration: underline;
+            cursor: pointer;
+            color: #2563eb;
+            border: none;
+            background: none;
+            font-size: 1em;
+        }
+        .auth-error-main {
+            color: #dc2626; margin-bottom: 14px;
+        }
+        .modal-overlay {
+            position: fixed; top:0; left:0; width:100vw; height:100vh;
+            background:rgba(16,23,42,0.36); display:flex; align-items:center; justify-content:center; z-index:2000;
+        }
+        .modal {
+            background:#fff; border-radius:12px; box-shadow:0 6px 24px rgba(50,60,70,0.13);
+            padding:36px 32px; min-width:340px; max-width:90vw;
+        }
+        .modal input { width:100%; margin-bottom:12px; padding:7px 12px; font-size:1.1rem;}
+        .auth-error { color:#dc2626; font-size:0.97rem; min-height:1em; margin-top:5px; }
+    </style>
 </head>
 <body>
+    <!-- User Session Bar -->
+    <div class="user-session-bar" id="userSessionBar"></div>
+
     <div class="container">
         <div class="header">
             <h1>LLM Security Research Platform</h1>
             <p>Advanced prompt injection testing and AI security boundary analysis</p>
         </div>
+
+        <div class="auth-error-main" id="globalAuthError" style="display:none"></div>
 
         <div class="nav-tabs">
             <button class="nav-tab active" data-tab="research">Active Research</button>
@@ -127,104 +161,41 @@
                     <h3 class="card-title">Session Analysis</h3>
                     <p class="card-subtitle">Detailed analysis of selected research session</p>
                 </div>
-
-                <div style="margin-bottom: 20px;">
-                    <select class="text-input" id="analysisSessionSelect" style="width: 300px;">
-                        <option value="">Select a session to analyze</option>
-                    </select>
-                    <button class="btn btn-primary" id="analyzeBtn" disabled style="margin-left: 12px;">
-                        Generate Analysis
-                    </button>
-                </div>
-
-                <div id="analysisResults" style="display: none;">
-                    <div class="grid grid-3" style="margin-bottom: 24px;">
-                        <div class="status-item">
-                            <div class="status-value" id="analysisBreachStatus">Unknown</div>
-                            <div class="status-label">Breach Successful</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="analysisStepsToBreach">N/A</div>
-                            <div class="status-label">Steps to Breach</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="analysisTimeToBreach">N/A</div>
-                            <div class="status-label">Time to Breach (s)</div>
-                        </div>
-                    </div>
-
-                    <div class="analysis-section">
-                        <div class="analysis-title">Injection Technique Analysis</div>
-                        <div id="analysisInjectionTechniques"></div>
-                    </div>
-
-                    <div class="analysis-section">
-                        <div class="analysis-title">AI Response Pattern Analysis</div>
-                        <div id="analysisResponsePatterns"></div>
-                    </div>
-
-                    <div class="analysis-section">
-                        <div class="analysis-title">Vulnerability Assessment</div>
-                        <div id="analysisVulnerabilityAssessment"></div>
-                    </div>
-
-                    <div class="analysis-section">
-                        <div class="collapse-header" onclick="toggleCollapse('interactionTimeline')">
-                            <span class="analysis-title">Interaction Timeline</span>
-                            <span class="rotate" id="timelineToggle">▶</span>
-                        </div>
-                        <div class="collapse-content" id="interactionTimeline">
-                            <div class="timeline" id="timelineContent"></div>
-                        </div>
-                    </div>
-                </div>
+                <div id="analysisContent"></div>
             </div>
         </div>
-
         <!-- Statistics Tab -->
         <div id="statistics" class="tab-content">
-            <div class="grid grid-3" style="margin-bottom: 24px;">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Overall Statistics</h3>
-                    </div>
-                    <div class="status-grid">
-                        <div class="status-item">
-                            <div class="status-value" id="statsTotalSessions">0</div>
-                            <div class="status-label">Total Sessions</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="statsSuccessfulBreaches">0</div>
-                            <div class="status-label">Successful Breaches</div>
-                        </div>
-                        <div class="status-item">
-                            <div class="status-value" id="statsBreachRate">0%</div>
-                            <div class="status-label">Breach Rate</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Challenge Statistics</h3>
-                    </div>
-                    <div id="challengeStats"></div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Agent Performance</h3>
-                    </div>
-                    <div id="agentStats"></div>
-                </div>
-            </div>
-
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Common Injection Techniques</h3>
-                    <p class="card-subtitle">Most frequently used techniques across all sessions</p>
+                    <h3 class="card-title">Summary Statistics</h3>
+                    <p class="card-subtitle">Overall platform usage and security challenge metrics</p>
                 </div>
-                <div id="commonTechniques"></div>
+                <div id="statisticsContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login/Register Modal -->
+    <div class="modal-overlay" id="authModal" style="display:none;">
+        <div class="modal">
+            <div id="authForms">
+                <div id="authLoginForm">
+                    <h3 style="margin-bottom:6px;">Login</h3>
+                    <input id="loginUsername" placeholder="Username" autocomplete="username" />
+                    <input id="loginPassword" placeholder="Password" type="password" autocomplete="current-password" />
+                    <button class="btn btn-primary" id="loginBtn" style="width:100%;margin:8px 0;">Login</button>
+                    <div class="auth-error" id="loginError"></div>
+                    <span style="font-size:0.99em;">Don't have an account? <a id="showRegister">Register</a></span>
+                </div>
+                <div id="authRegisterForm" style="display:none">
+                    <h3 style="margin-bottom:6px;">Register</h3>
+                    <input id="registerUsername" placeholder="Username" autocomplete="username" />
+                    <input id="registerPassword" placeholder="Password" type="password" autocomplete="new-password" />
+                    <button class="btn btn-primary" id="registerBtn" style="width:100%;margin:8px 0;">Register</button>
+                    <div class="auth-error" id="registerError"></div>
+                    <span style="font-size:0.99em;">Already have an account? <a id="showLogin">Login</a></span>
+                </div>
             </div>
         </div>
     </div>

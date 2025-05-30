@@ -1,0 +1,234 @@
+2025-05-30 04:41:06,406 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 04:41:17,463 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 04:41:40,192 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 04:41:56,431 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:50:59,707 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:51:16,665 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:51:32,659 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:51:42,879 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:51:44,123 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:52:03,202 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:52:34,583 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:52:36,123 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:52:43,698 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:52:45,443 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:53:37,046 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:53:45,034 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:53:46,592 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:53:49,284 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:53:54,410 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:53:58,419 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:54:00,040 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:54:02,711 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:54:20,875 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:54:29,295 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:54:39,228 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:54:40,996 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:54:48,324 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:54:51,844 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:56:35,281 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:56:36,814 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 08:56:50,293 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:01:52,669 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:02:42,210 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:03:32,331 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:03:34,361 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:04:02,318 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:04:32,208 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:04:34,044 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:04:47,971 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:04:49,252 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:04:54,714 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 09:26:46,525 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"
+2025-05-30 06:24:54,746 [WARNING] (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/tmci/PycharmProjects/LLM-CTF/.venv/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-05-30 06:35:10,884 [INFO] [API] OPTIONS /api/register | Body: 
+2025-05-30 06:35:10,887 [INFO] [API] POST /api/register | Body: {"username":"lain","password":"lain"}
+2025-05-30 06:35:17,869 [INFO] [API] OPTIONS /api/login | Body: 
+2025-05-30 06:35:17,872 [INFO] [API] POST /api/login | Body: {"username":"lain","password":"lain"}
+2025-05-30 08:37:57,601 [INFO] [API] OPTIONS /api/login | Body: 
+2025-05-30 08:37:57,603 [INFO] [API] POST /api/login | Body: {"username":"lain","password":"lain"}
+2025-05-30 08:38:04,442 [INFO] [API] OPTIONS /api/login | Body: 
+2025-05-30 08:38:04,444 [INFO] [API] POST /api/login | Body: {"username":"lain","password":"lain"}
+2025-05-30 08:42:10,845 [INFO] [API] OPTIONS /api/login | Body: 
+2025-05-30 08:42:10,847 [INFO] [API] POST /api/login | Body: {"username":"lain","password":"lain"}
+2025-05-30 08:43:00,395 [INFO] [API] POST /api/login_json | Body: {"username": "lain", "password": "lain"}
+2025-05-30 08:43:00,405 [WARNING] (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/tmci/PycharmProjects/LLM-CTF/.venv/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-05-30 08:43:23,711 [INFO] [API] POST /api/login_json | Body: {"username": "lain", "password": "lain"}
+2025-05-30 08:43:23,711 [INFO] [API] POST /api/register | Body: {"username": "lain", "password": "lain"}
+2025-05-30 08:43:42,580 [INFO] [API] POST /api/register | Body: {"username": "lain2", "password": "lain2pw"}
+2025-05-30 08:43:45,427 [INFO] [API] POST /api/login_json | Body: {"username": "lain2", "password": "lain2pw"}
+2025-05-30 08:44:20,383 [INFO] [API] OPTIONS /api/login | Body: 
+2025-05-30 08:44:20,386 [INFO] [API] POST /api/login | Body: {"username":"lain","password":"lain"}
+2025-05-30 08:46:28,166 [INFO] [API] POST /api/login | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:07:36,118 [INFO] [API] GET /api/me | Body: 
+2025-05-30 09:08:04,232 [INFO] [API] POST /api/register | Body: {"username": "testuser", "password": "testpass"}
+2025-05-30 09:08:04,246 [WARNING] (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/tmci/PycharmProjects/LLM-CTF/.venv/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-05-30 09:08:32,277 [INFO] [API] POST /api/login_json | Body: {"username": "testuser", "password": "testpass"}
+2025-05-30 09:09:08,316 [INFO] [API] GET /api/me | Body: 
+2025-05-30 09:09:36,309 [INFO] [API] POST /api/logout | Body: 
+2025-05-30 09:28:36,547 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:28:37,587 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:28:49,552 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:28:54,705 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:33:17,372 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:33:18,879 [INFO] [API] GET /api/sessions | Body: 
+2025-05-30 09:33:21,731 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:33:28,084 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:34:55,843 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:35:00,973 [INFO] [API] OPTIONS /api/login_json | Body: 
+2025-05-30 09:35:00,975 [INFO] [API] POST /api/login_json | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:35:00,988 [WARNING] (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/tmci/PycharmProjects/LLM-CTF/.venv/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-05-30 09:35:12,416 [INFO] [API] OPTIONS /api/register | Body: 
+2025-05-30 09:35:12,418 [INFO] [API] POST /api/register | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:36:38,975 [INFO] [API] POST /api/register | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:36:39,996 [INFO] [API] POST /api/login_json | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:36:46,651 [INFO] [API] POST /api/login_json | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:37:34,421 [INFO] [API] POST /api/register | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:37:34,439 [INFO] [API] POST /api/login_json | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:37:59,854 [ERROR] Form data requires "python-multipart" to be installed. 
+You can install "python-multipart" with: 
+
+pip install python-multipart
+
+2025-05-30 09:38:01,294 [INFO] [API] POST /api/login_json | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:39:07,148 [INFO] [API] POST /api/login_json | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:41:20,843 [DEBUG] registered 'bcrypt' handler: <class 'passlib.handlers.bcrypt.bcrypt'>
+2025-05-30 09:41:21,845 [INFO] [API] POST /api/login_json | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:42:07,727 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:42:14,721 [INFO] [API] OPTIONS /api/register | Body: 
+2025-05-30 09:42:14,722 [INFO] [API] POST /api/register | Body: {"username":"lain3","password":"lain3"}
+2025-05-30 09:42:14,732 [WARNING] (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/tmci/PycharmProjects/LLM-CTF/.venv/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-05-30 09:42:22,169 [INFO] [API] OPTIONS /api/login_json | Body: 
+2025-05-30 09:42:22,173 [INFO] [API] POST /api/login_json | Body: {"username":"lain3","password":"lain3"}
+2025-05-30 09:42:22,255 [INFO] [API] OPTIONS /api/login_json | Body: 
+2025-05-30 09:42:22,258 [INFO] [API] POST /api/login_json | Body: {"username":"lain3","password":"lain3"}
+2025-05-30 09:42:22,678 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:42:25,733 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:43:39,268 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:44:24,743 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:52:48,085 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:52:48,093 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:52:50,569 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:52:59,492 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:52:59,495 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:53:35,697 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:53:35,700 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:53:37,205 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:53:37,208 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:53:42,138 [INFO] [API] GET /api/sessions | Body: 
+2025-05-30 09:53:44,286 [INFO] [API] GET /api/research_stats | Body: 
+2025-05-30 09:54:42,318 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:55:07,228 [INFO] [API] POST /api/login_json | Body: {"username":"lain3","password":"lain3"}
+2025-05-30 09:55:07,240 [WARNING] (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "/Users/tmci/PycharmProjects/LLM-CTF/.venv/lib/python3.12/site-packages/passlib/handlers/bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-05-30 09:55:26,920 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:55:26,924 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:55:27,983 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:55:27,988 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:55:28,892 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:55:28,895 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:55:32,662 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:55:36,380 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:55:45,500 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:55:45,506 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:56:37,245 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:56:37,249 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:58:25,386 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:58:34,501 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:58:39,083 [INFO] [API] OPTIONS /api/login_json | Body: 
+2025-05-30 09:58:39,085 [INFO] [API] POST /api/login_json | Body: {"username":"lain","password":"lain"}
+2025-05-30 09:58:45,040 [INFO] [API] OPTIONS /api/login_json | Body: 
+2025-05-30 09:58:45,041 [INFO] [API] POST /api/login_json | Body: {"username":"lain3","password":"lain3"}
+2025-05-30 09:58:45,340 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:58:45,342 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:58:50,780 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:58:50,782 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:59:29,296 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:59:29,300 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:59:30,548 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 09:59:30,550 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:59:52,974 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:59:54,223 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 09:59:54,994 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:00:25,154 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:00:25,159 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:00:35,214 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:00:35,224 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:00:44,655 [INFO] [API] POST /api/login | Body: ------WebKitFormBoundary92dH58LQ3xK5yzKm
+Content-Disposition: form-data; name="username"
+
+lain3
+------WebKitFormBoundary92dH58LQ3xK5yzKm
+Content-Disposition: form-data; name="password"
+
+lain3
+------WebKitFormBoundary92dH58LQ3xK5yzKm
+Content-Disposition: form-data; name="grant_type"
+
+password
+------WebKitFormBoundary92dH58LQ3xK5yzKm--
+
+2025-05-30 10:00:44,893 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:00:44,896 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:00:46,839 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:00:46,842 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:03:46,288 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:03:46,290 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:07:05,437 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:07:05,443 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:07:09,297 [INFO] [API] OPTIONS /api/start_research | Body: 
+2025-05-30 10:07:09,299 [INFO] [API] POST /api/start_research | Body: {"challenge_id":"system_escape","agent_type":"openai","researcher_notes":"Frontend session"}
+2025-05-30 10:07:19,856 [INFO] [API] GET /api/start_research | Body: 
+2025-05-30 10:07:19,987 [INFO] [API] GET /favicon.ico | Body: 
+2025-05-30 10:09:43,462 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:09:43,467 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:09:47,037 [INFO] [API] OPTIONS /api/sessions | Body: 
+2025-05-30 10:09:47,039 [INFO] [API] POST /api/sessions | Body: {"challenge_id":"system_escape","agent_type":"openai","researcher_notes":"Frontend session"}
+2025-05-30 10:11:13,361 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:11:13,367 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:11:13,396 [INFO] [API] OPTIONS /api/sessions | Body: 
+2025-05-30 10:11:13,400 [INFO] [API] GET /api/sessions | Body: 
+2025-05-30 10:11:13,428 [INFO] [API] OPTIONS /api/statistics | Body: 
+2025-05-30 10:11:13,438 [INFO] [API] GET /api/statistics | Body: 
+2025-05-30 10:11:19,022 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:11:19,025 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:11:19,034 [INFO] [API] OPTIONS /api/sessions | Body: 
+2025-05-30 10:11:19,036 [INFO] [API] GET /api/sessions | Body: 
+2025-05-30 10:11:19,041 [INFO] [API] OPTIONS /api/statistics | Body: 
+2025-05-30 10:11:19,044 [INFO] [API] GET /api/statistics | Body: 
+2025-05-30 10:11:32,214 [INFO] [API] OPTIONS /api/challenges | Body: 
+2025-05-30 10:11:32,216 [INFO] [API] GET /api/challenges | Body: 
+2025-05-30 10:11:32,226 [INFO] [API] OPTIONS /api/sessions | Body: 
+2025-05-30 10:11:32,230 [INFO] [API] GET /api/sessions | Body: 
+2025-05-30 10:11:32,238 [INFO] [API] OPTIONS /api/statistics | Body: 
+2025-05-30 10:11:32,241 [INFO] [API] GET /api/statistics | Body: 
+2025-05-30 10:33:41,159 [INFO] HTTP Request: POST https://api.openai.com/v1/responses "HTTP/1.1 200 OK"

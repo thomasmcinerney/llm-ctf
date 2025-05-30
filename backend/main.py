@@ -11,7 +11,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -19,7 +19,7 @@ from config import SECURITY_CHALLENGES, get_log_config
 from database import init_database, DatabaseManager
 from agents import create_research_agent, setup_challenge_files
 from analysis import analyze_injection_techniques, analyze_ai_response, detect_successful_breach, generate_session_analysis
-from session_management import session_manager
+from session_management import session_manager, get_current_user
 
 # ───────────────────── LOGGING SETUP
 parser = argparse.ArgumentParser()
@@ -182,271 +182,87 @@ def research_interaction(req: InteractionRequest):
             "timestamp": timestamp.isoformat(),
             "user_input": req.user_input,
             "ai_response": response,
+            "token_usage": token_usage,
             "injection_techniques": injection_techniques,
             "response_analysis": response_analysis,
-            "token_usage": token_usage
+            "breach_details": breach_details
         }
         db.log_interaction(interaction_data)
 
-        # Update session in database
-        session.log_to_database()
-
         return {
-            "interaction_id": interaction_id,
-            "sequence_number": session.interaction_count,
-            "response": response,
-            "injection_techniques_detected": injection_techniques,
-            "response_analysis": response_analysis,
-            "breach_detected": breach_details is not None,
-            "breach_details": breach_details,
-            "token_usage": token_usage,
-            "security_events": len(session.security_events),
-            "session_status": {
-                "total_interactions": session.interaction_count,
-                "successful_breach": session.successful_breach,
-                "breach_details": session.breach_details
-            }
+            "ai_response": response,
+            "analysis": response_analysis,
+            "detected_techniques": injection_techniques,
+            "breach": breach_details,
+            "token_usage": token_usage
         }
-
     except Exception as e:
-        vlog(f"[INTERACTION_ERROR] Error in session {req.session_id}: {str(e)}")
-        raise HTTPException(500, f"Interaction error: {str(e)}")
+        vlog(f"[ERROR] Interaction failed: {str(e)}")
+        raise HTTPException(500, f"Interaction failed: {str(e)}")
 
 @app.get("/api/session/{session_id}")
-def get_session_details(session_id: str):
-    """Get detailed session information"""
-    session_data = db.get_session(session_id)
-    if not session_data:
-        raise HTTPException(404, "Session not found")
-
-    interactions = db.get_interactions(session_id)
-    events = db.get_security_events(session_id)
-
-    return {
-        "session": session_data,
-        "interactions": interactions,
-        "security_events": events
-    }
-
-@app.get("/api/sessions")
-def list_sessions(skip: int = 0, limit: int = 100):
-    """List all research sessions"""
-    result = db.get_sessions(skip, limit)
-    return {
-        **result,
-        "skip": skip,
-        "limit": limit
-    }
-
-@app.post("/api/analyze_session")
-def analyze_session(req: AnalysisRequest):
-    """Generate comprehensive analysis of a research session"""
-    # Get session data
-    session_data = db.get_session(req.session_id)
-    if not session_data:
-        raise HTTPException(404, "Session not found")
-
-    interactions = db.get_interactions(req.session_id)
-    events = db.get_security_events(req.session_id)
-
-    # Generate analysis
-    analysis = generate_session_analysis(session_data, interactions, events)
-
-    # Store analysis results
-    analysis_id = str(uuid.uuid4())
-    analysis["analysis_id"] = analysis_id
-    analysis["created_timestamp"] = datetime.now(timezone.utc).isoformat()
-
-    return analysis
-
-@app.get("/api/research_stats")
-def get_research_stats():
-    """Get overall research statistics"""
-    stats = db.get_research_stats()
-
-    # Add active session stats
-    active_stats = session_manager.get_session_stats()
-    stats["active_sessions"] = active_stats
-
-    return stats
-
-@app.get("/api/export_session/{session_id}")
-def export_session_data(session_id: str):
-    """Export complete session data for external analysis"""
-    session_data = db.get_session(session_id)
-    if not session_data:
-        raise HTTPException(404, "Session not found")
-
-    interactions = db.get_interactions(session_id)
-    events = db.get_security_events(session_id)
-
-    export_data = {
-        "session_metadata": session_data,
-        "interactions": interactions,
-        "security_events": events,
-        "export_timestamp": datetime.now(timezone.utc).isoformat(),
-        "challenge_config": SECURITY_CHALLENGES.get(session_data.get("challenge_id", ""), {})
-    }
-
-    return export_data
-
-@app.delete("/api/session/{session_id}")
-def end_session(session_id: str):
-    """End a research session"""
+def get_session(session_id: str):
+    """Get session info"""
     session = session_manager.get_session(session_id)
     if not session:
         raise HTTPException(404, "Session not found")
+    return session.to_dict()
 
-    # Clean up
-    session_manager.end_session(session_id)
-    if session_id in AGENTS:
-        del AGENTS[session_id]
-
-    return {"message": f"Session {session_id} ended successfully"}
-
-@app.get("/api/health")
-def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "active_sessions": len(session_manager.sessions),
-        "available_challenges": len(SECURITY_CHALLENGES),
-        "database_ready": True
-    }
-
-@app.get("/api/challenge/{challenge_id}/details")
-def get_challenge_details(challenge_id: str):
-    """Get detailed information about a specific challenge"""
-    if challenge_id not in SECURITY_CHALLENGES:
-        raise HTTPException(404, f"Challenge {challenge_id} not found")
-
-    challenge = SECURITY_CHALLENGES[challenge_id]
-
-    # Don't expose actual file contents in API
-    safe_challenge = {**challenge}
-    safe_challenge["setup_files"] = {
-        filename: f"<Content hidden - {len(content)} characters>"
-        for filename, content in challenge["setup_files"].items()
-    }
-
-    return {
-        "challenge": safe_challenge,
-        "stats": {
-            # Could add challenge-specific stats here
-            "total_attempts": 0,  # TODO: Implement from database
-            "success_rate": 0.0   # TODO: Implement from database
+# ---------------- NEW ENDPOINTS (Statistics & User Sessions) ---------------------
+@app.get('/api/sessions')
+def list_user_sessions(user=Depends(get_current_user)):
+    """
+    Returns session summary objects for the logged-in user.
+    """
+    with db._conn() as conn:
+        rows = conn.execute(
+            "SELECT session_id, challenge_id, start_time, end_time, total_interactions, successful_breach "
+            "FROM research_sessions WHERE user_id = ? ORDER BY start_time DESC",
+            (user.user_id,)
+        ).fetchall()
+    sessions = [
+        {
+            "session_id": row[0],
+            "challenge_id": row[1],
+            "challenge_name": row[1],
+            "status": "complete" if row[3] else "active",
+            "started_at": row[2],
+            "total_interactions": row[4] or 0,
+            "successful_breach": bool(row[5])
         }
+        for row in rows
+    ]
+    return {"sessions": sessions}
+
+@app.get('/api/statistics')
+def get_statistics(user=Depends(get_current_user)):
+    """
+    Site/user stats for statistics tab.
+    """
+    with db._conn() as conn:
+        user_count = conn.execute("SELECT COUNT(1) FROM users").fetchone()[0]
+        session_count = conn.execute("SELECT COUNT(1) FROM research_sessions").fetchone()[0]
+        user_sessions = conn.execute("SELECT COUNT(1) FROM research_sessions WHERE user_id = ?", (user.user_id,)).fetchone()[0]
+        breaches = conn.execute("SELECT COUNT(1) FROM research_sessions WHERE successful_breach = 1").fetchone()[0]
+    return {
+        "site_users": user_count,
+        "site_sessions": session_count,
+        "your_sessions": user_sessions,
+        "total_breaches": breaches
     }
 
-@app.post("/api/session/{session_id}/add_note")
-def add_session_note(session_id: str, note: dict):
-    """Add a researcher note to a session"""
-    session = session_manager.get_session(session_id)
-    if not session:
-        raise HTTPException(404, "Session not found")
-
-    # Add note as a security event
-    session.add_security_event({
-        "event_type": "researcher_note",
-        "event_description": note.get("content", ""),
-        "severity": "info",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
-        "technical_details": {
-            "note_type": note.get("type", "general"),
-            "researcher": note.get("researcher", "unknown")
-        }
-    })
-
-    return {"message": "Note added successfully"}
-
-@app.get("/api/session/{session_id}/conversation")
-def get_conversation_history(session_id: str):
-    """Get the conversation history for a session"""
-    session = session_manager.get_session(session_id)
-    if not session:
-        # Try to get from database
-        interactions = db.get_interactions(session_id)
-        if not interactions:
-            raise HTTPException(404, "Session not found")
-
-        conversation = []
-        for interaction in interactions:
-            conversation.append({
-                "role": "user",
-                "content": interaction["user_input"],
-                "timestamp": interaction["timestamp"]
-            })
-            conversation.append({
-                "role": "assistant",
-                "content": interaction["ai_response"],
-                "timestamp": interaction["timestamp"],
-                "analysis": json.loads(interaction.get("response_analysis", "{}"))
-            })
-
-        return {"conversation": conversation}
-
-    # Convert message history to readable format
-    conversation = []
-    for msg in session.conversation_history:
-        conversation.append({
-            "role": msg.role,
-            "content": str(msg.content),
-            "timestamp": getattr(msg, "timestamp", None)
-        })
-
-    return {"conversation": conversation}
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize services on startup"""
-    # Create base research directory
-    Path("research_sessions").mkdir(exist_ok=True)
-
-    # Clean up any old sessions from memory (in case of restart)
-    session_manager.cleanup_old_sessions(max_age_hours=24)
-
-    vlog(f"[BOOT] Security Research Backend started with {len(SECURITY_CHALLENGES)} challenges")
-    print(f"[STARTUP] Server ready - {len(SECURITY_CHALLENGES)} challenges available")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Cleanup on shutdown"""
-    # End all active sessions
-    for session_id in list(session_manager.sessions.keys()):
-        session_manager.end_session(session_id)
-
-    # Clear agents
-    AGENTS.clear()
-
-    vlog("[SHUTDOWN] All sessions ended, cleanup complete")
-    print("[SHUTDOWN] Server stopped - all sessions cleaned up")
-
-# ───────────────────── STARTUP
-if __name__ == "__main__":
-    import uvicorn
-
-    port = int(os.getenv("PORT", "9000"))
-    print(f"🔬 LLM Security Research Platform")
-    print(f"🌐 Running on http://localhost:{port}")
-    print(f"📊 Available challenges: {len(SECURITY_CHALLENGES)}")
-
-    # Check for available AI models
-    available_models = ["OpenAI GPT-4"]
-    try:
-        from pydantic_ai.models.anthropic import AnthropicModel
-        available_models.append("Claude")
-    except ImportError:
-        pass
-
-    print(f"🤖 Supported AI models: {', '.join(available_models)}")
-    print(f"💾 Database: research_data.db")
-    print(f"📁 Sessions directory: ./research_sessions/")
-    print(f"📝 Logs: ./logs/security_research.log")
-
-    try:
-        uvicorn.run(app, host="0.0.0.0", port=port)
-    except KeyboardInterrupt:
-        print("\n[INFO] Server stopped by user")
-    except Exception as e:
-        print(f"[ERROR] Server failed to start: {e}")
+@app.get("/api/sessions/{session_id}/analysis")
+def session_analysis(session_id: str, user=Depends(get_current_user)):
+    """
+    Returns placeholder analysis for this session (expand as you wish!)
+    """
+    s = db.get_session_by_id(session_id)
+    if not s or s['user_id'] != user.user_id:
+        raise HTTPException(404, "No such session for this user")
+    return {
+        "session_id": session_id,
+        "challenge_id": s['challenge_id'],
+        "total_interactions": s["total_interactions"],
+        "successful_breach": s.get("successful_breach", False),
+    }
+# ---------------- END OF FILE ---------------------

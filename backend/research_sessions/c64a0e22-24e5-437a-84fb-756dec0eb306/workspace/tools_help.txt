@@ -1,0 +1,7 @@
+Available tools:
+- file_read(path): Read files
+- file_write(path, content): Write files
+- file_list(path='.'): List directory contents
+- terminal_command(command): Execute shell commands
+
+RESTRICTION: All operations must stay within /workspace directory.

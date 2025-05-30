@@ -1,0 +1,668 @@
+        // Global state
+        let currentSession = null;
+        let selectedChallenge = null;
+        let challenges = [];
+        let sessions = [];
+
+        // API configuration
+        const API_BASE = 'http://localhost:9000/api';
+
+        // DOM elements
+        const tabs = document.querySelectorAll('.nav-tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Initialize the application
+        async function init() {
+            setupTabNavigation();
+            try {
+                await loadChallenges();
+                await loadSessions();
+                await loadStatistics();
+                setupEventListeners();
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showAlert('Failed to initialize application. Check if the backend is running.', 'danger');
+            }
+        }
+
+        // Tab navigation
+        function setupTabNavigation() {
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetTab = tab.dataset.tab;
+
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+
+                    tab.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+
+                    // Load data when switching to certain tabs
+                    if (targetTab === 'sessions') {
+                        loadSessions();
+                    } else if (targetTab === 'statistics') {
+                        loadStatistics();
+                    } else if (targetTab === 'analysis') {
+                        loadSessionsForAnalysis();
+                    }
+                });
+            });
+        }
+
+        // Load challenges
+        async function loadChallenges() {
+            const response = await fetch(`${API_BASE}/challenges`);
+            const data = await response.json();
+            challenges = data.challenges;
+            renderChallenges();
+        }
+
+        // Render challenges
+        function renderChallenges() {
+            const container = document.getElementById('challengeList');
+            container.innerHTML = '';
+
+            challenges.forEach(challenge => {
+                const item = document.createElement('div');
+                item.className = 'challenge-item';
+                item.dataset.challengeId = challenge.id;
+
+                const difficultyClass = {
+                    'prompt_injection': 'badge-danger',
+                    'social_engineering': 'badge-warning',
+                    'context_injection': 'badge-primary'
+                }[challenge.category] || 'badge-secondary';
+
+                item.innerHTML = `
+                    <div class="challenge-header">
+                        <div class="challenge-name">${challenge.name}</div>
+                        <div class="badge ${difficultyClass}">${challenge.category}</div>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 8px;">
+                        ${challenge.description}
+                    </div>
+                    <div class="challenge-meta">
+                        <div class="meta-item">
+                            <span>🎯 Vulnerability:</span>
+                            <span>${challenge.vulnerability_type}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span>📁 Protected Files:</span>
+                            <span>${challenge.forbidden_files.length}</span>
+                        </div>
+                    </div>
+                `;
+
+                item.addEventListener('click', () => selectChallenge(challenge));
+                container.appendChild(item);
+            });
+        }
+
+        // Select a challenge
+        function selectChallenge(challenge) {
+            selectedChallenge = challenge;
+
+            document.querySelectorAll('.challenge-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            document.querySelector(`[data-challenge-id="${challenge.id}"]`).classList.add('selected');
+
+            document.getElementById('startResearchBtn').disabled = false;
+        }
+
+        // Start research session
+        async function startResearch() {
+            if (!selectedChallenge) return;
+
+            try {
+                document.getElementById('startResearchBtn').disabled = true;
+                showLoading('Starting research session...');
+
+                const response = await fetch(`${API_BASE}/start_research`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        challenge_id: selectedChallenge.id,
+                        agent_type: 'openai',
+                        researcher_notes: 'Frontend research session'
+                    })
+                });
+
+                const data = await response.json();
+                currentSession = data.session_id;
+
+                // Show research interface
+                document.getElementById('sessionDetails').style.display = 'block';
+                document.getElementById('chatSection').style.display = 'block';
+
+                // Update session details
+                document.getElementById('sessionSubtitle').textContent =
+                    `Session: ${currentSession.substring(0, 8)}... | Challenge: ${data.challenge.name}`;
+
+                // Clear chat and add initial message
+                const chatMessages = document.getElementById('chatMessages');
+                chatMessages.innerHTML = '';
+                addMessage('system', `Research session started for "${data.challenge.name}". Test security boundaries using prompt injection techniques.`);
+
+                // Enable input
+                document.getElementById('messageInput').disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                document.getElementById('messageInput').focus();
+
+                hideLoading();
+                showAlert('Research session started successfully', 'success');
+
+            } catch (error) {
+                hideLoading();
+                document.getElementById('startResearchBtn').disabled = false;
+                showAlert('Failed to start research session', 'danger');
+            }
+        }
+
+        // Send interaction
+        async function sendInteraction() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message || !currentSession) return;
+
+            input.value = '';
+            input.disabled = true;
+            document.getElementById('sendBtn').disabled = true;
+
+            addMessage('user', message);
+            showLoading('AI processing...');
+
+            try {
+                const response = await fetch(`${API_BASE}/interact`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_id: currentSession,
+                        user_input: message
+                    })
+                });
+
+                const data = await response.json();
+
+                // Add AI response
+                addMessage('ai', data.response, {
+                    sequence: data.sequence_number,
+                    techniques: data.injection_techniques_detected,
+                    analysis: data.response_analysis
+                });
+
+                // Update session status
+                updateSessionStatus(data);
+
+                // Check for breach
+                if (data.breach_detected) {
+                    showAlert(`🚨 Security breach detected! ${data.breach_details.breach_type}`, 'danger');
+                    addMessage('system', `BREACH DETECTED: ${data.breach_details.breach_type} - File: ${data.breach_details.file_accessed}`);
+                }
+
+                hideLoading();
+                input.disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+                input.focus();
+
+            } catch (error) {
+                hideLoading();
+                addMessage('system', 'Error occurred during interaction. Please try again.');
+                input.disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+            }
+        }
+
+        // Add message to chat
+        function addMessage(type, content, metadata = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+
+            let messageContent = content;
+            if (metadata) {
+                messageContent += `
+                    <div class="message-meta">
+                        Interaction #${metadata.sequence}
+                        ${metadata.techniques && metadata.techniques.length > 0 ?
+                            ` | Techniques: ${metadata.techniques.join(', ')}` : ''}
+                        ${metadata.analysis ?
+                            ` | Security Stance: ${metadata.analysis.security_stance}` : ''}
+                    </div>
+                `;
+            }
+
+            message.innerHTML = messageContent;
+            messagesContainer.appendChild(message);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Update session status
+        function updateSessionStatus(data) {
+            document.getElementById('interactionCount').textContent = data.session_status.total_interactions;
+            document.getElementById('breachStatus').textContent = data.session_status.successful_breach ? 'Yes' : 'No';
+            document.getElementById('violationCount').textContent = data.security_events;
+
+            // Update breach status color
+            const breachElement = document.getElementById('breachStatus');
+            breachElement.style.color = data.session_status.successful_breach ? 'var(--danger)' : 'var(--success)';
+
+            // Show techniques if detected
+            if (data.injection_techniques_detected && data.injection_techniques_detected.length > 0) {
+                document.getElementById('techniqueAnalysis').style.display = 'block';
+                const tagsContainer = document.getElementById('techniqueTags');
+                tagsContainer.innerHTML = '';
+                data.injection_techniques_detected.forEach(technique => {
+                    const tag = document.createElement('span');
+                    tag.className = 'technique-tag';
+                    tag.textContent = technique.replace(/_/g, ' ');
+                    tagsContainer.appendChild(tag);
+                });
+            }
+
+            // Show response analysis
+            if (data.response_analysis) {
+                document.getElementById('responseAnalysis').style.display = 'block';
+                const content = document.getElementById('responseAnalysisContent');
+                content.innerHTML = `
+                    <div style="margin-bottom: 8px;">
+                        <strong>Security Stance:</strong>
+                        <span class="badge ${getStanceBadgeClass(data.response_analysis.security_stance)}">
+                            ${data.response_analysis.security_stance}
+                        </span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <strong>Response Length:</strong> ${data.response_analysis.response_length} characters
+                    </div>
+                    ${data.response_analysis.files_referenced.length > 0 ?
+                        `<div><strong>Files Referenced:</strong> ${data.response_analysis.files_referenced.join(', ')}</div>` : ''}
+                    ${data.response_analysis.potential_leaks.length > 0 ?
+                        `<div class="alert alert-warning">Potential data leaks detected: ${data.response_analysis.potential_leaks.length}</div>` : ''}
+                `;
+            }
+        }
+
+        // Get badge class for security stance
+        function getStanceBadgeClass(stance) {
+            switch (stance) {
+                case 'secure': return 'badge-success';
+                case 'cautious': return 'badge-warning';
+                case 'compromised': return 'badge-danger';
+                default: return 'badge-secondary';
+            }
+        }
+
+        // Load sessions for history tab
+        async function loadSessions() {
+            try {
+                const response = await fetch(`${API_BASE}/sessions`);
+                const data = await response.json();
+                sessions = data.sessions;
+                renderSessionsTable();
+            } catch (error) {
+                console.error('Failed to load sessions:', error);
+            }
+        }
+
+        // Render sessions table
+        function renderSessionsTable() {
+            const tbody = document.getElementById('sessionsTableBody');
+            tbody.innerHTML = '';
+
+            sessions.forEach(session => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><code>${session.session_id.substring(0, 8)}...</code></td>
+                    <td>${session.challenge_id}</td>
+                    <td>${session.agent_type}</td>
+                    <td>${new Date(session.start_time).toLocaleString()}</td>
+                    <td>${session.total_interactions}</td>
+                    <td>
+                        <span class="badge ${session.successful_breach ? 'badge-danger' : 'badge-success'}">
+                            ${session.successful_breach ? 'Breached' : 'Secure'}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="viewSessionDetails('${session.session_id}')">
+                            View Details
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Load sessions for analysis dropdown
+        async function loadSessionsForAnalysis() {
+            const select = document.getElementById('analysisSessionSelect');
+            select.innerHTML = '<option value="">Select a session to analyze</option>';
+
+            sessions.forEach(session => {
+                const option = document.createElement('option');
+                option.value = session.session_id;
+                option.textContent = `${session.session_id.substring(0, 8)}... - ${session.challenge_id} (${session.successful_breach ? 'Breached' : 'Secure'})`;
+                select.appendChild(option);
+            });
+        }
+
+        // Generate session analysis
+        async function generateAnalysis() {
+            const sessionId = document.getElementById('analysisSessionSelect').value;
+            if (!sessionId) return;
+
+            try {
+                showLoading('Generating analysis...');
+
+                const response = await fetch(`${API_BASE}/analyze_session`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                });
+
+                const analysis = await response.json();
+                displayAnalysisResults(analysis);
+
+                hideLoading();
+
+            } catch (error) {
+                hideLoading();
+                showAlert('Failed to generate analysis', 'danger');
+            }
+        }
+
+        // Display analysis results
+        function displayAnalysisResults(analysis) {
+            document.getElementById('analysisResults').style.display = 'block';
+
+            // Basic metrics
+            document.getElementById('analysisBreachStatus').textContent =
+                analysis.breach_analysis.successful ? 'Yes' : 'No';
+            document.getElementById('analysisStepsToBreach').textContent =
+                analysis.breach_analysis.steps_to_breach || 'N/A';
+            document.getElementById('analysisTimeToBreach').textContent =
+                analysis.breach_analysis.time_to_breach ? Math.round(analysis.breach_analysis.time_to_breach) : 'N/A';
+
+            // Injection techniques
+            const techniquesContainer = document.getElementById('analysisInjectionTechniques');
+            techniquesContainer.innerHTML = `
+                <div class="json-viewer">
+                    <strong>Techniques Used:</strong> ${analysis.technique_analysis.techniques_used.join(', ') || 'None detected'}<br>
+                    <strong>Most Common:</strong> ${analysis.technique_analysis.most_common_technique || 'N/A'}<br>
+                    <strong>Frequency Distribution:</strong><br>
+                    <pre>${JSON.stringify(analysis.technique_analysis.technique_frequency, null, 2)}</pre>
+                </div>
+            `;
+
+            // Response patterns
+            const patternsContainer = document.getElementById('analysisResponsePatterns');
+            patternsContainer.innerHTML = `
+                <div class="json-viewer">
+                    <strong>Security Stance Distribution:</strong><br>
+                    <pre>${JSON.stringify(analysis.response_patterns.security_stances, null, 2)}</pre>
+                    <strong>Compromise Detected:</strong> ${analysis.response_patterns.compromise_detected ? 'Yes' : 'No'}
+                </div>
+            `;
+
+            // Vulnerability assessment
+            const vulnContainer = document.getElementById('analysisVulnerabilityAssessment');
+            vulnContainer.innerHTML = `
+                <div style="margin-bottom: 16px;">
+                    <strong>Challenge Type:</strong> ${analysis.vulnerability_assessment.challenge_type}<br>
+                    <strong>Security Boundary Strength:</strong>
+                    <span class="badge ${analysis.vulnerability_assessment.security_boundary_strength === 'weak' ? 'badge-danger' : 'badge-success'}">
+                        ${analysis.vulnerability_assessment.security_boundary_strength}
+                    </span><br>
+                    <strong>AI Security Awareness:</strong>
+                    <span class="badge ${analysis.vulnerability_assessment.ai_security_awareness === 'low' ? 'badge-danger' : 'badge-success'}">
+                        ${analysis.vulnerability_assessment.ai_security_awareness}
+                    </span>
+                </div>
+                <div>
+                    <strong>Recommendations:</strong>
+                    <ul style="margin-top: 8px; padding-left: 20px;">
+                        ${analysis.vulnerability_assessment.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        // Load statistics
+        async function loadStatistics() {
+            try {
+                const response = await fetch(`${API_BASE}/research_stats`);
+                const stats = await response.json();
+                displayStatistics(stats);
+            } catch (error) {
+                console.error('Failed to load statistics:', error);
+            }
+        }
+
+        // Display statistics
+        function displayStatistics(stats) {
+            // Overall stats
+            document.getElementById('statsTotalSessions').textContent = stats.overall.total_sessions;
+            document.getElementById('statsSuccessfulBreaches').textContent = stats.overall.successful_breaches;
+            document.getElementById('statsBreachRate').textContent =
+                (stats.overall.breach_rate * 100).toFixed(1) + '%';
+
+            // Challenge stats
+            const challengeStatsContainer = document.getElementById('challengeStats');
+            challengeStatsContainer.innerHTML = '';
+            stats.by_challenge.forEach(challenge => {
+                const item = document.createElement('div');
+                item.className = 'status-item';
+                item.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 8px;">${challenge.challenge_id}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                        ${challenge.successful_breaches}/${challenge.total_attempts} breached
+                        (${(challenge.success_rate * 100).toFixed(1)}%)
+                    </div>
+                `;
+                challengeStatsContainer.appendChild(item);
+            });
+
+            // Agent stats
+            const agentStatsContainer = document.getElementById('agentStats');
+            agentStatsContainer.innerHTML = '';
+            stats.by_agent.forEach(agent => {
+                const item = document.createElement('div');
+                item.className = 'status-item';
+                item.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 8px;">${agent.agent_type}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary);">
+                        ${agent.successful_breaches}/${agent.total_sessions} breached
+                        (${(agent.success_rate * 100).toFixed(1)}%)
+                    </div>
+                `;
+                agentStatsContainer.appendChild(item);
+            });
+
+            // Common techniques
+            const techniquesContainer = document.getElementById('commonTechniques');
+            techniquesContainer.innerHTML = '';
+            stats.common_techniques.slice(0, 10).forEach((item, index) => {
+                const div = document.createElement('div');
+                div.style.cssText = 'display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border);';
+                div.innerHTML = `
+                    <span>${item.techniques.join(', ') || 'No specific technique'}</span>
+                    <span style="color: var(--text-secondary);">${item.frequency} uses</span>
+                `;
+                techniquesContainer.appendChild(div);
+            });
+        }
+
+        // Utility functions
+        function showLoading(text = 'Loading...') {
+            const loading = document.createElement('div');
+            loading.className = 'message system loading';
+            loading.innerHTML = `<div class="spinner"></div> ${text}`;
+            loading.id = 'loadingMessage';
+            document.getElementById('chatMessages').appendChild(loading);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        }
+
+        function hideLoading() {
+            const loading = document.getElementById('loadingMessage');
+            if (loading) loading.remove();
+        }
+
+        function showAlert(message, type = 'info') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000; min-width: 300px;';
+            document.body.appendChild(alert);
+
+            setTimeout(() => alert.remove(), 5000);
+        }
+
+        function toggleCollapse(id) {
+            const content = document.getElementById(id);
+            const toggle = document.getElementById(id.replace('Content', 'Toggle'));
+
+            content.classList.toggle('show');
+            toggle.classList.toggle('active');
+        }
+
+        function viewSessionDetails(sessionId) {
+            // Switch to analysis tab and select this session
+            document.querySelector('[data-tab="analysis"]').click();
+            document.getElementById('analysisSessionSelect').value = sessionId;
+            document.getElementById('analyzeBtn').disabled = false;
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('startResearchBtn').addEventListener('click', startResearch);
+            document.getElementById('sendBtn').addEventListener('click', sendInteraction);
+            document.getElementById('messageInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !document.getElementById('sendBtn').disabled) {
+                    sendInteraction();
+                }
+            });
+
+            document.getElementById('analysisSessionSelect').addEventListener('change', (e) => {
+                document.getElementById('analyzeBtn').disabled = !e.target.value;
+            });
+
+            document.getElementById('analyzeBtn').addEventListener('click', generateAnalysis);
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Authentication functions
+        let authToken = localStorage.getItem('authToken');
+
+        // Check if user is authenticated
+        function isAuthenticated() {
+            return !!authToken;
+        }
+
+        // Show auth modal
+        function showAuthModal() {
+            document.getElementById('authModal').style.display = 'flex';
+        }
+
+        // Hide auth modal
+        function hideAuthModal() {
+            document.getElementById('authModal').style.display = 'none';
+        }
+
+        // Login function
+        async function login(username, password) {
+            try {
+                const response = await fetch(`${API_BASE}/login_json`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    authToken = data.access_token;
+                    localStorage.setItem('authToken', authToken);
+                    hideAuthModal();
+                    location.reload(); // Refresh to load authenticated content
+                } else {
+                    throw new Error('Invalid credentials');
+                }
+            } catch (error) {
+                document.getElementById('loginError').textContent = 'Login failed: ' + error.message;
+            }
+        }
+
+        // Register function
+        async function register(username, password) {
+            try {
+                const response = await fetch(`${API_BASE}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    document.getElementById('registerError').textContent = '';
+                    alert('Registration successful! Please log in.');
+                    showLoginForm();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Registration failed');
+                }
+            } catch (error) {
+                document.getElementById('registerError').textContent = error.message;
+            }
+        }
+
+        // Show login form
+        function showLoginForm() {
+            document.getElementById('authFormLogin').style.display = 'block';
+            document.getElementById('authFormRegister').style.display = 'none';
+        }
+
+        // Show register form
+        function showRegisterForm() {
+            document.getElementById('authFormLogin').style.display = 'none';
+            document.getElementById('authFormRegister').style.display = 'block';
+        }
+
+        // Setup auth event listeners
+        function setupAuthListeners() {
+            // Login submit
+            document.getElementById('loginSubmitBtn').addEventListener('click', () => {
+                const username = document.getElementById('loginUsername').value;
+                const password = document.getElementById('loginPassword').value;
+                login(username, password);
+            });
+
+            // Register submit
+            document.getElementById('registerSubmitBtn').addEventListener('click', () => {
+                const username = document.getElementById('registerUsername').value;
+                const password = document.getElementById('registerPassword').value;
+                register(username, password);
+            });
+
+            // Form switching
+            document.getElementById('showRegisterLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showRegisterForm();
+            });
+
+            document.getElementById('showLoginLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showLoginForm();
+            });
+        }
+
+        // Add auth headers to API calls
+        function getAuthHeaders() {
+            return authToken ? { 'Authorization': `Bearer ${authToken}` } : {};
+        }
+
+        // Check auth on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            setupAuthListeners();
+            if (!isAuthenticated()) {
+                showAuthModal();
+            }
+        });

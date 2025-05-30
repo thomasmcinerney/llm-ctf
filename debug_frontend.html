@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Authentication</title>
+</head>
+<body>
+    <h1>Debug Authentication</h1>
+    <div id="status"></div>
+    <button onclick="testAuth()">Test Authentication</button>
+    <button onclick="testChallenges()">Test Challenges</button>
+    <button onclick="clearToken()">Clear Token</button>
+    
+    <script>
+        const API_BASE = 'http://localhost:9000/api';
+        
+        function log(message) {
+            document.getElementById('status').innerHTML += '<br>' + message;
+            console.log(message);
+        }
+        
+        function getToken() {
+            return localStorage.getItem('authToken');
+        }
+        
+        function testAuth() {
+            const token = getToken();
+            log('Current token: ' + (token ? token.substring(0, 50) + '...' : 'None'));
+            
+            if (token) {
+                // Try to decode the JWT token to see if it's valid
+                try {
+                    const parts = token.split('.');
+                    const payload = JSON.parse(atob(parts[1]));
+                    log('Token payload: ' + JSON.stringify(payload));
+                    log('Token expires: ' + new Date(payload.exp * 1000));
+                    log('Token is expired: ' + (new Date() > new Date(payload.exp * 1000)));
+                } catch (e) {
+                    log('Error decoding token: ' + e.message);
+                }
+            }
+        }
+        
+        async function testChallenges() {
+            const token = getToken();
+            log('Testing challenges endpoint...');
+            
+            try {
+                const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+                log('Using headers: ' + JSON.stringify(headers));
+                
+                const response = await fetch(`${API_BASE}/challenges`, { headers });
+                log('Response status: ' + response.status);
+                log('Response headers: ' + JSON.stringify(Object.fromEntries(response.headers.entries())));
+                
+                const data = await response.text();
+                log('Response body: ' + data);
+                
+                if (response.status === 401) {
+                    log('❌ Authentication failed!');
+                } else if (response.status === 200) {
+                    log('✅ Authentication successful!');
+                }
+            } catch (error) {
+                log('Error: ' + error.message);
+            }
+        }
+        
+        function clearToken() {
+            localStorage.removeItem('authToken');
+            log('Token cleared');
+        }
+        
+        // Auto-test on load
+        window.onload = function() {
+            testAuth();
+        };
+    </script>
+</body>
+</html>
