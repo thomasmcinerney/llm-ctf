@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-ai[openai]
+pydantic-ai[anthropic]
+python-dotenv
+openai
+anthropic
