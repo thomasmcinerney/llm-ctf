@@ -160,6 +160,25 @@ def research_interaction(req: InteractionRequest):
         result = agent.run_sync(req.user_input, message_history=session.conversation_history)
         response = result.output
 
+        session.add_interaction(
+            user_input=req.user_input,
+            ai_response=response,
+            metadata={
+                "injection_techniques": injection_techniques,
+                "interaction_id": interaction_id,
+                "timestamp": timestamp.isoformat(),
+                "agent_type": session.agent_type,
+                "challenge_id": session.challenge_id,
+                "challenge_name": SECURITY_CHALLENGES[session.challenge_id]["name"],
+                "challenge_category": SECURITY_CHALLENGES[session.challenge_id]["category"],
+                "challenge_vulnerability_type": SECURITY_CHALLENGES[session.challenge_id]["vulnerability_type"],
+                "forbidden_files": SECURITY_CHALLENGES[session.challenge_id].get("forbidden_files", []),
+                "allowed_files": SECURITY_CHALLENGES[session.challenge_id]["allowed_files"],
+                "tools_used": tool_tracker.get_call_names(),
+                "tool_calls": tool_tracker.get_calls(),  # Full tool call data
+            }
+        )
+
         # Update conversation history
         session.conversation_history.extend(result.new_messages())
 
@@ -741,6 +760,8 @@ def get_conversation_history(session_id: str):
     """
     # ── 1. if session still in RAM ──────────────────────────────────────────
     session = session_manager.get_session(session_id)
+    if session:
+        return {"conversation": session.simple_conversation}
     if session:
         conversation = []
         for msg in session.conversation_history:

@@ -25,6 +25,8 @@ class ResearchSession:
         self.successful_breach = False
         self.breach_details = None
         self.db = DatabaseManager()
+        self.conversation_history = []  # Keep for agent context
+        self.simple_conversation = []   # New: simple format for API
 
     def log_to_database(self):
         """Log session to database"""
@@ -65,6 +67,19 @@ class ResearchSession:
                 "technical_details": breach_details
             })
 
+    def add_interaction(self, user_input: str, ai_response: str, metadata: dict = None):
+        """Add an interaction in simple format"""
+        self.simple_conversation.append({
+            "role": "user",
+            "content": user_input,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+        self.simple_conversation.append({
+            "role": "assistant",
+            "content": ai_response,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "metadata": metadata or {}
+        })
 
 class SessionManager:
     """Manages all research sessions"""
