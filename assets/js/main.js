@@ -10,7 +10,7 @@ let currentConversationData = null;
 let currentSessionInteractions = [];
 
 // API configuration
-const API_BASE = 'http://localhost:9000/api';
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:9000/api`;
 
 // DOM elements
 const tabs = document.querySelectorAll('.nav-tab');

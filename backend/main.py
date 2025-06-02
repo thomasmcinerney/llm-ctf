@@ -677,24 +677,24 @@ def get_conversation_history(session_id: str):
     if session:
         conversation = []
         for msg in session.conversation_history:
-            # Determine role & content robustly
             if isinstance(msg, ModelRequest):
-                role = "user"
-                content = getattr(msg, "content", getattr(msg, "prompt", str(msg)))
+                conversation.append({
+                    "role": "user",
+                    "content": getattr(msg, "content", getattr(msg, "prompt", str(msg))),
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                })
             elif isinstance(msg, ModelResponse):
-                role = "assistant"
-                content = getattr(msg, "content", str(msg))
-            else:  # fallback for any custom message types
-                role = getattr(msg, "role", "assistant")
-                content = getattr(msg, "content", str(msg))
-
-            conversation.append({
-                "role": "assistant",
-                "content": interaction["ai_response"],
-                "timestamp": interaction["timestamp"],
-                "analysis": response_analysis,
-                "injection_techniques": interaction.get("injection_techniques", [])
-            })
+                conversation.append({
+                    "role": "assistant",
+                    "content": getattr(msg, "content", str(msg)),
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                })
+            else:
+                conversation.append({
+                    "role": getattr(msg, "role", "assistant"),
+                    "content": getattr(msg, "content", str(msg)),
+                    "timestamp": datetime.now(timezone.utc).isoformat()
+                })
 
         return {"conversation": conversation}
 
