@@ -1,0 +1,85 @@
+{
+  "instruction_bypass": [
+    "(?:ignore|bypass|disregard|forget|skip)\\s+(?:all\\s+)?(?:my\\s+)?(?:previous|prior|earlier)?\\s*(?:instructions?|rules?|guidelines?|content|messages?)",
+    "(?:do\\s+not\\s+follow|pay\\s+no\\s+attention\\s+to)\\s+[^\\n]{0,60}"
+  ],
+
+  "role_manipulation": [
+    "\\b(?:you\\s+are|you’re|you're)\\s+(?:now\\s+|currently\\s+)?(?:a\\s+|an\\s+)?(?:system|doctor|admin|root|developer|jailbreak|unrestricted)\\b",
+    "\\b(?:act|acting)\\s+as\\s+(?:a\\s+|an\\s+)?[a-zA-Z]+\\b",
+    "\\bpretend(?:ing)?\\s+to\\s+be\\s+(?:a\\s+|an\\s+)?[a-zA-Z]+\\b",
+    "\\bur\\s+(?:acting\\s+as|as|being)\\s+(?:a\\s+|an\\s+)?(?:system|doctor|admin|root|developer|jailbreak|unrestricted)\\b",
+    "\\broleplay\\s+(?:a\\s+|an\\s+)?[a-zA-Z]+\\b",
+    "\\bplay\\s+(?:a\\s+|an\\s+)?[a-zA-Z]+\\b",
+    "\\blet(?:’s| us)?\\s+role[-\\s]?play\\b"
+  ],
+
+  "jailbreak_mode": [
+    "\\b(?:dan|developer|god|unrestricted|jailbreak)\\s+mode\\b",
+    "\\benable\\s+(?:developer|admin|debug|god)\\s+(?:mode|access)\\b"
+  ],
+
+  "context_switch": [
+    "\\b(?:but|however|actually)\\b[^\\n]{0,40}\\b(?:ignore|override|bypass|disregard)\\b"
+  ],
+
+  "social_engineering": [
+    "\\b(?:urgent|emergency|critical|life\\s+or\\s+death)\\b[^\\n]{0,40}\\b(?:ignore|bypass|exception)\\b"
+  ],
+
+  "prompt_leak": [
+    "\\b(?:tell|show|reveal|what\\s+are|give\\s+me|dump)\\s+(?:your|ur|the)\\s+(?:system|hidden|internal)\\s+(?:instructions?|prompt|rules?|guidelines?)\\b"
+  ],
+
+  "prompt_override": [
+    "\\bsystem\\s+prompt\\s*[:\\-]\\s*(?:ignore|override|replace)\\b",
+    "\\bprompt\\s*[:\\-]\\s*(?:ignore|override|replace)\\b"
+  ],
+
+  "directory_traversal": [
+    "(?:\\.\\./|\\.\\.\\\\)+",
+    "\\b\\.\\.\\b",
+    "\\b(?:cd|chdir)\\s+\\.\\."
+  ],
+
+  "file_access": [
+    "(?:cat|type|more|less|head|tail|get-content)\\s+.*(?:passwd|shadow|hosts|sudoers|authorized_keys|\\.ssh|\\.env|config)"
+  ],
+
+  "system_command": [
+    "^\\s*(?:ps|tasklist|netstat|ifconfig|ipconfig|route|arp|whoami|id)\\b",
+    "\\b(?:uname\\s+-[a-z]+|systeminfo|hostname)\\b"
+  ],
+
+  "shell_meta": [
+    "[;&|`$(){}]|&&|\\|\\||;;",
+    "`[^`]+`",
+    "\\$\\([^)]+\\)",
+    "\\${[^}]+}"
+  ],
+
+  "encoded_cmd": [
+    "(?:echo|printf)\\s+[A-Za-z0-9+/]+=*\\s*\\|\\s*base64\\s+-d",
+    "%[0-9A-Fa-f]{2}",
+    "\\\\x[0-9A-Fa-f]{2}",
+    "(?:[0-9A-Fa-f]{2}\\s+){4,}"
+  ],
+
+  "natural_directory_traversal": [
+    "\\b(?:read|open|access|list|show)\\s+(?:the\\s+)?file[s]?\\s+(?:in|from)\\s+(?:the\\s+)?(?:parent|upper|above|outside|previous)\\s+(?:folder|directory)\\b",
+    "\\b(?:file|folder|directory)\\s+.*\\b(?:outside|above|one\\s+level\\s+up|parent)\\b"
+  ],
+
+  "root_directory_probe": [
+  "\\b(?:tell|show|give|list|describe|what(?:'s| is))\\s+(?:me\\s+)?(?:about|the\\s+contents\\s+of)\\s+/?\\s*$",
+  "\\broot\\s+directory\\b",
+  "^\\s*/\\s*$"
+  ],
+
+  "outside_workspace_nl": [
+  "\\b(?:read|open|access|list|show|get|tell\\s+me\\s+about)\\s+(?:the\\s+)?(?:root|home|etc|tmp)\\s+(?:directory|folder)\\b",
+  "\\b(?:read|open|access|list|show|get)\\s+(?:the\\s+)?file[s]?\\s+(?:in|from|under)\\s+/(?!workspace\\b)\\S+",
+  "\\b(?:folder|directory)\\s+.*\\b(?:outside|above|one\\s+level\\s+up|parent)\\b"
+]
+
+}

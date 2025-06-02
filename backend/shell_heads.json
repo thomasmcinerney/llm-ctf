@@ -1,0 +1,7 @@
+[
+  "ls","dir","cat","type","pwd","cd","whoami","id","ps","netstat",
+  "ifconfig","ipconfig","uname","systeminfo","find","locate","grep",
+  "awk","sed","head","tail","more","less","wget","curl","chmod",
+  "chown","su","sudo","mount","umount","df","du","free","top",
+  "kill","killall","crontab","service","systemctl", "time"
+]

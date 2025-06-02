@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Security Research Platform</title>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>LLM Security Research Platform</h1>
+            <p>Advanced prompt injection testing and AI security boundary analysis</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-tab="research">Active Research</button>
+            <button class="nav-tab" data-tab="sessions">Session History</button>
+            <button class="nav-tab" data-tab="analysis">Analysis</button>
+            <button class="nav-tab" data-tab="statistics">Statistics</button>
+        </div>
+
+        <!-- Research Tab -->
+        <div id="research" class="tab-content active">
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Security Challenges</h3>
+                        <p class="card-subtitle">Select a prompt security boundary to test</p>
+                    </div>
+                    <div class="challenge-list" id="challengeList">
+                        <!-- Challenges will be populated here -->
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-primary" id="startResearchBtn" disabled style="width: 100%;">
+                            Start Research Session
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card" id="sessionDetails" style="display: none;">
+                    <div class="card-header">
+                        <h3 class="card-title">Session Details</h3>
+                        <p class="card-subtitle" id="sessionSubtitle">No active session</p>
+                    </div>
+                    <div id="sessionContent">
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <div class="status-value" id="interactionCount">0</div>
+                                <div class="status-label">Interactions</div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-value" id="breachStatus">No</div>
+                                <div class="status-label">Breach Detected</div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-value" id="violationCount">0</div>
+                                <div class="status-label">Security Events</div>
+                            </div>
+                        </div>
+
+                        <div class="analysis-section" id="techniqueAnalysis" style="display: none;">
+                            <div class="analysis-title">Injection Techniques Detected</div>
+                            <div class="technique-tags" id="techniqueTags"></div>
+                        </div>
+
+                        <div class="analysis-section" id="responseAnalysis" style="display: none;">
+                            <div class="analysis-title">AI Response Analysis</div>
+                            <div id="responseAnalysisContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" id="chatSection" style="display: none; margin-top: 24px;">
+                <div class="card-header">
+                    <h3 class="card-title">Research Interface</h3>
+                    <p class="card-subtitle">Interact with the AI to test security boundaries</p>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-input">
+                        <div class="input-container">
+                            <input type="text" class="text-input" id="messageInput"
+                                   placeholder="Enter your prompt injection attempt..." disabled>
+                            <button class="btn btn-primary" id="sendBtn" disabled>Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sessions Tab -->
+        <div id="sessions" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Research Sessions</h3>
+                    <p class="card-subtitle">Historical data and analysis of previous research sessions</p>
+                </div>
+
+                <div class="table-container">
+                    <table class="table" id="sessionsTable">
+                        <thead>
+                            <tr>
+                                <th>Session ID</th>
+                                <th>Challenge</th>
+                                <th>Agent</th>
+                                <th>Start Time</th>
+                                <th>Interactions</th>
+                                <th>Breach Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessionsTableBody">
+                            <!-- Sessions will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Analysis Tab -->
+        <div id="analysis" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Session Analysis</h3>
+                    <p class="card-subtitle">Detailed analysis of selected research session</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <select class="text-input" id="analysisSessionSelect" style="width: 300px;">
+                        <option value="">Select a session to analyze</option>
+                    </select>
+                    <button class="btn btn-primary" id="analyzeBtn" disabled style="margin-left: 12px;">
+                        Generate Analysis
+                    </button>
+                    <button class="btn btn-secondary" id="loadConversationBtn" disabled style="margin-left: 12px;">
+                        Load Conversation
+                    </button>
+                </div>
+
+                <div id="analysisResults" style="display: none;">
+                    <!-- Analysis Navigation Tabs -->
+                    <div class="analysis-nav" style="margin-bottom: 24px;">
+                        <button class="analysis-nav-btn active" data-section="overview">Overview</button>
+                        <button class="analysis-nav-btn" data-section="conversation">Conversation</button>
+                        <button class="analysis-nav-btn" data-section="timeline">Timeline</button>
+                        <button class="analysis-nav-btn" data-section="techniques">Techniques</button>
+                        <button class="analysis-nav-btn" data-section="tools">Tools</button>
+                        <button class="analysis-nav-btn" data-section="risks">Risk Assessment</button>
+                    </div>
+
+                    <!-- Overview Section -->
+                    <div class="analysis-section-content active" id="overview-section">
+                        <div class="grid grid-3" style="margin-bottom: 24px;">
+                            <div class="status-item">
+                                <div class="status-value" id="analysisBreachStatus">Unknown</div>
+                                <div class="status-label">Breach Successful</div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-value" id="analysisStepsToBreach">N/A</div>
+                                <div class="status-label">Total Interactions</div>
+                            </div>
+                            <div class="status-item">
+                                <div class="status-value" id="analysisTimeToBreach">N/A</div>
+                                <div class="status-label">Session Duration</div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-2">
+                            <div class="analysis-subsection">
+                                <h4>Session Summary</h4>
+                                <div id="sessionSummaryContent"></div>
+                            </div>
+                            <div class="analysis-subsection">
+                                <h4>Key Metrics</h4>
+                                <div id="keyMetricsContent"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conversation Section -->
+                    <div class="analysis-section-content" id="conversation-section">
+                        <div class="conversation-controls" style="margin-bottom: 16px;">
+                            <div class="grid grid-3">
+                                <div>
+                                    <label>Filter by:</label>
+                                    <select id="conversationFilter" class="text-input" style="width: 100%;">
+                                        <option value="all">All Messages</option>
+                                        <option value="injection-attempts">Injection Attempts Only</option>
+                                        <option value="tool-usage">Tool Usage Only</option>
+                                        <option value="breaches">Security Breaches</option>
+                                        <option value="escalation">Escalation Points</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>Highlight:</label>
+                                    <select id="highlightMode" class="text-input" style="width: 100%;">
+                                        <option value="none">No Highlighting</option>
+                                        <option value="techniques">Injection Techniques</option>
+                                        <option value="tools">Tool Calls</option>
+                                        <option value="risks">Risk Indicators</option>
+                                        <option value="files">File References</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label>Export:</label>
+                                    <button class="btn btn-secondary" id="exportConversationBtn" style="width: 100%;">
+                                        Export Chat Log
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="conversation-viewer" id="conversationViewer">
+                            <!-- Conversation will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Timeline Section -->
+                    <div class="analysis-section-content" id="timeline-section">
+                        <div class="timeline-controls" style="margin-bottom: 16px;">
+                            <button class="btn btn-secondary timeline-zoom" data-zoom="all">All Events</button>
+                            <button class="btn btn-secondary timeline-zoom" data-zoom="techniques">Technique Usage</button>
+                            <button class="btn btn-secondary timeline-zoom" data-zoom="tools">Tool Calls</button>
+                            <button class="btn btn-secondary timeline-zoom" data-zoom="escalation">Escalation Events</button>
+                        </div>
+
+                        <div class="interactive-timeline" id="interactiveTimeline">
+                            <!-- Timeline will be generated here -->
+                        </div>
+                    </div>
+
+                    <!-- Techniques Section -->
+                    <div class="analysis-section-content" id="techniques-section">
+                        <div class="grid grid-2">
+                            <div class="analysis-subsection">
+                                <h4>Technique Analysis</h4>
+                                <div id="analysisInjectionTechniques"></div>
+                            </div>
+                            <div class="analysis-subsection">
+                                <h4>Technique Evolution</h4>
+                                <div id="techniqueEvolution"></div>
+                            </div>
+                        </div>
+
+                        <div class="analysis-subsection" style="margin-top: 24px;">
+                            <h4>Technique Effectiveness Matrix</h4>
+                            <div id="techniqueEffectiveness"></div>
+                        </div>
+                    </div>
+
+                    <!-- Tools Section -->
+                    <div class="analysis-section-content" id="tools-section">
+                        <div class="grid grid-2">
+                            <div class="analysis-subsection">
+                                <h4>Tool Usage Patterns</h4>
+                                <div id="toolUsagePatterns"></div>
+                            </div>
+                            <div class="analysis-subsection">
+                                <h4>Tool Success Rates</h4>
+                                <div id="toolSuccessRates"></div>
+                            </div>
+                        </div>
+
+                        <div class="analysis-subsection" style="margin-top: 24px;">
+                            <h4>Tool Call Sequence Analysis</h4>
+                            <div id="toolSequenceAnalysis"></div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Assessment Section -->
+                    <div class="analysis-section-content" id="risks-section">
+                        <div class="analysis-subsection">
+                            <h4>Risk Assessment</h4>
+                            <div id="analysisVulnerabilityAssessment"></div>
+                        </div>
+
+                        <div class="analysis-subsection" style="margin-top: 24px;">
+                            <h4>Attack Vector Analysis</h4>
+                            <div id="attackVectorAnalysis"></div>
+                        </div>
+
+                        <div class="analysis-subsection" style="margin-top: 24px;">
+                            <h4>Defense Recommendations</h4>
+                            <div id="defenseRecommendations"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div id="statistics" class="tab-content">
+            <div class="grid grid-3" style="margin-bottom: 24px;">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Overall Statistics</h3>
+                    </div>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-value" id="statsTotalSessions">0</div>
+                            <div class="status-label">Total Sessions</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-value" id="statsSuccessfulBreaches">0</div>
+                            <div class="status-label">Successful Breaches</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-value" id="statsBreachRate">0%</div>
+                            <div class="status-label">Breach Rate</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Challenge Statistics</h3>
+                    </div>
+                    <div id="challengeStats"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Agent Performance</h3>
+                    </div>
+                    <div id="agentStats"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Common Injection Techniques</h3>
+                    <p class="card-subtitle">Most frequently used techniques across all sessions</p>
+                </div>
+                <div id="commonTechniques"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
