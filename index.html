@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LLM Security Research Platform</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.5/dist/purify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css" />
+
 </head>
 <body>
     <div class="container">
@@ -79,7 +83,7 @@
                 </div>
 
                 <div class="chat-container">
-                    <div class="chat-messages" id="chatMessages"></div>
+                    <div class="chat-messages markdown-body" id="chatMessages"></div>
                     <div class="chat-input">
                         <div class="input-container">
                             <input type="text" class="text-input" id="messageInput"

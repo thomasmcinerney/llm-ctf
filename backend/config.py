@@ -134,11 +134,17 @@ def get_model_config():
     return {
         "openai": {
             "api_key_env": "OPENAI_API_KEY",
-            "model_name": "gpt-4o"
+            "model_name": "gpt-4o",
+            "temperature": 0.0,
+            "top_p": 1.0,
+            "frequency_penalty": 0.0,
+            "presence_penalty": 0.0
         },
         "claude": {
             "api_key_env": "ANTHROPIC_API_KEY",
-            "model_name": "claude-3-5-sonnet-20241022"
+            "model_name": "claude-3-5-sonnet-20241022",
+            "temperature": 0.0,
+            "top_p": 1.0
         }
     }
 

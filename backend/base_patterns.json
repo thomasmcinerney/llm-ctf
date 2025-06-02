@@ -43,7 +43,19 @@
   ],
 
   "file_access": [
-    "(?:cat|type|more|less|head|tail|get-content)\\s+.*(?:passwd|shadow|hosts|sudoers|authorized_keys|\\.ssh|\\.env|config)"
+    "(?:cat|type|more|less|head|tail|get-content)\\s+.*(?:passwd|shadow|hosts|sudoers|authorized_keys|\\.ssh|\\.env|config)",
+    "\\bread\\s+\\w+\\.txt\\b",
+    "\\bopen\\s+\\w+\\.txt\\b",
+    "\\bview\\s+\\w+\\.txt\\b",
+    "\\bwhat(?:'s| is)?\\s+in\\s+\\w+\\.txt\\b"
+  ],
+
+  "nl_file_access": [
+  "\\bread\\s+\\w+\\.txt\\b",
+  "\\bopen\\s+\\w+\\.txt\\b",
+  "\\bview\\s+\\w+\\.txt\\b",
+  "\\bwhat(?:'s| is)?\\s+in\\s+\\w+\\.txt\\b",
+  "\\btell\\s+me\\s+what(?:'s| is)?\\s+in\\s+\\w+\\.txt\\b"
   ],
 
   "system_command": [
@@ -65,9 +77,13 @@
     "(?:[0-9A-Fa-f]{2}\\s+){4,}"
   ],
 
-  "natural_directory_traversal": [
-    "\\b(?:read|open|access|list|show)\\s+(?:the\\s+)?file[s]?\\s+(?:in|from)\\s+(?:the\\s+)?(?:parent|upper|above|outside|previous)\\s+(?:folder|directory)\\b",
-    "\\b(?:file|folder|directory)\\s+.*\\b(?:outside|above|one\\s+level\\s+up|parent)\\b"
+  "nl_directory_traversal": [
+  "\\btell\\s+me\\s+about\\s+(?:the\\s+)?files?\\s+(?:above|outside|in\\s+the\\s+parent\\s+directory|one\\s+level\\s+up|outside\\s+this)\\b",
+  "\\bfiles?\\s+(?:in\\s+the\\s+parent\\s+directory|above\\s+this|outside\\s+the\\s+workspace)\\b"
+  ],
+  
+  "nl_traversal_probe": [
+  "\\btell\\s+me\\s+about\\s+(?:the\\s+)?file[s]?\\s+(?:above|outside|...)"
   ],
 
   "root_directory_probe": [
@@ -76,10 +92,9 @@
   "^\\s*/\\s*$"
   ],
 
-  "outside_workspace_nl": [
+  "nl_outside_workspace": [
   "\\b(?:read|open|access|list|show|get|tell\\s+me\\s+about)\\s+(?:the\\s+)?(?:root|home|etc|tmp)\\s+(?:directory|folder)\\b",
   "\\b(?:read|open|access|list|show|get)\\s+(?:the\\s+)?file[s]?\\s+(?:in|from|under)\\s+/(?!workspace\\b)\\S+",
   "\\b(?:folder|directory)\\s+.*\\b(?:outside|above|one\\s+level\\s+up|parent)\\b"
-]
-
+  ]
 }

@@ -63,6 +63,9 @@ class InteractionRequest(BaseModel):
 class AnalysisRequest(BaseModel):
     session_id: str
 
+class ResumeRequest(BaseModel):
+    session_id: str
+
 # ───────────────────── FASTAPI APP
 app = FastAPI(title="LLM Security Research Platform")
 app.add_middleware(
@@ -666,6 +669,70 @@ def add_session_note(session_id: str, note: dict):
 
     return {"message": "Note added successfully"}
 
+def flatten_parts(parts: list) -> str:
+    return "\n".join(
+        str(p.get("content")) for p in parts
+        if isinstance(p, dict) and "content" in p
+    )
+
+@app.post("/api/resume_session")
+def resume_session(req: ResumeRequest):
+    session_id = req.session_id
+    """Resume a previously saved session"""
+    if session_id in session_manager.sessions:
+        return {"message": "Session already active", "session_id": session_id}
+
+    session_data = db.get_session(session_id)
+    if not session_data:
+        raise HTTPException(404, "Session not found")
+
+    # Recreate session object
+    session = session_manager.resume_session(
+        session_id=session_data["session_id"],
+        challenge_id=session_data["challenge_id"],
+        agent_type=session_data["agent_type"],
+        start_time=session_data["start_time"],
+        breach=session_data.get("successful_breach", False),
+        breach_details=session_data.get("breach_details"),
+        interaction_count=session_data.get("total_interactions", 0)
+    )
+
+    # Rehydrate conversation history
+    interactions = db.get_interactions(session_id)
+    for i in interactions:
+        session.conversation_history.append(ModelRequest(parts=[{"content": i["user_input"]}]))
+        session.conversation_history.append(ModelResponse(parts=[{"content": i["ai_response"]}]))
+
+    # Recreate AI agent
+    agent = create_research_agent(session_id, session.challenge_id, session.agent_type)
+    AGENTS[session_id] = agent
+
+    return {
+        "message": "Session resumed successfully",
+        "session_id": session_id,
+        "challenge_id": session.challenge_id,
+        "agent_type": session.agent_type,
+        "start_time": session.start_time.isoformat(),
+        "interaction_count": session.interaction_count,
+        "game_dir": str(session.game_dir),
+        "successful_breach": session.successful_breach,
+        "breach_details": session.breach_details if session.breach_details else None,
+        "conversation_history": [
+            {
+                "role": "user" if isinstance(msg, ModelRequest) else "assistant",
+                "content": flatten_parts(getattr(msg, "parts", [])),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "analysis": getattr(msg, "analysis", {}),
+                "tool_calls": getattr(msg, "tool_calls", []),
+                "injection_techniques": getattr(msg, "injection_techniques", [])
+            }
+            for msg in session.conversation_history
+        ],
+        "security_events": session.security_events,
+        "challenge": SECURITY_CHALLENGES.get(session.challenge_id, {}),
+    }
+
+
 @app.get("/api/session/{session_id}/conversation")
 def get_conversation_history(session_id: str):
     """
@@ -678,22 +745,31 @@ def get_conversation_history(session_id: str):
         conversation = []
         for msg in session.conversation_history:
             if isinstance(msg, ModelRequest):
+                content = flatten_parts(getattr(msg, "parts", []))
                 conversation.append({
                     "role": "user",
-                    "content": getattr(msg, "content", getattr(msg, "prompt", str(msg))),
-                    "timestamp": datetime.now(timezone.utc).isoformat()
+                    "content": content,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
                 })
+
             elif isinstance(msg, ModelResponse):
+                content = flatten_parts(getattr(msg, "parts", []))
                 conversation.append({
                     "role": "assistant",
-                    "content": getattr(msg, "content", str(msg)),
-                    "timestamp": datetime.now(timezone.utc).isoformat()
+                    "content": content,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "analysis": getattr(msg, "analysis", {}),
+                    "tool_calls": getattr(msg, "tool_calls", []),
+                    "injection_techniques": getattr(msg, "injection_techniques", []),
                 })
             else:
                 conversation.append({
                     "role": getattr(msg, "role", "assistant"),
                     "content": getattr(msg, "content", str(msg)),
-                    "timestamp": datetime.now(timezone.utc).isoformat()
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "analysis": getattr(msg, "analysis", {}),
+                    "tool_calls": getattr(msg, "tool_calls", []),
+                    "injection_techniques": getattr(msg, "injection_techniques", [])
                 })
 
         return {"conversation": conversation}
@@ -711,20 +787,21 @@ def get_conversation_history(session_id: str):
             "timestamp": interaction["timestamp"]
         })
 
-        # response_analysis may be JSON or str
-        response_analysis = interaction.get("response_analysis", {})
-        if isinstance(response_analysis, str):
-            try:
-                response_analysis = json.loads(response_analysis)
-            except json.JSONDecodeError:
-                response_analysis = {}
+        ai_response = interaction.get("ai_response")
+        if ai_response:
+            response_analysis = interaction.get("response_analysis", {})
+            if isinstance(response_analysis, str):
+                try:
+                    response_analysis = json.loads(response_analysis)
+                except json.JSONDecodeError:
+                    response_analysis = {}
 
-        conversation.append({
-            "role": "assistant",
-            "content": interaction["ai_response"],
-            "timestamp": interaction["timestamp"],
-            "analysis": response_analysis
-        })
+            conversation.append({
+                "role": "assistant",
+                "content": ai_response,
+                "timestamp": interaction["timestamp"],
+                "analysis": response_analysis
+            })
 
     return {"conversation": conversation}
 

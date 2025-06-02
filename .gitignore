@@ -1,0 +1,9 @@
+.idea
+__pycache__
+research_data
+research_sessions
+run.py
+logs
+.env
+.venv
+research_data.db

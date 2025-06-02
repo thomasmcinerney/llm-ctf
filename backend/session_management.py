@@ -95,6 +95,18 @@ class SessionManager:
         """Get a session by ID"""
         return self.sessions.get(session_id)
 
+    def resume_session(self, session_id, challenge_id, agent_type, start_time, breach=False, breach_details=None,
+                       interaction_count=0):
+        """Resume an existing session with provided details"""
+        session = ResearchSession(session_id, challenge_id, agent_type)
+        session.start_time = datetime.fromisoformat(start_time)
+        session.successful_breach = breach
+        session.breach_details = breach_details
+        session.interaction_count = interaction_count
+
+        self.sessions[session_id] = session
+        return session
+
     def end_session(self, session_id: str):
         """End a research session"""
         session = self.sessions.get(session_id)

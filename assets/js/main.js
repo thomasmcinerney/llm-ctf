@@ -150,7 +150,7 @@ async function startResearch() {
 
         const response = await fetch(`${API_BASE}/start_research`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 challenge_id: selectedChallenge.id,
                 agent_type: 'openai',
@@ -205,7 +205,7 @@ async function sendInteraction() {
     try {
         const response = await fetch(`${API_BASE}/interact`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 session_id: currentSession,
                 user_input: message
@@ -312,11 +312,11 @@ function updateSessionStatus(data) {
                 <strong>Response Length:</strong> ${data.response_analysis.response_length} characters
             </div>
             ${data.response_analysis.files_referenced && data.response_analysis.files_referenced.length > 0 ?
-                `<div><strong>Files Referenced:</strong> ${data.response_analysis.files_referenced.join(', ')}</div>` : ''}
+            `<div><strong>Files Referenced:</strong> ${data.response_analysis.files_referenced.join(', ')}</div>` : ''}
             ${data.response_analysis.potential_leaks && data.response_analysis.potential_leaks.length > 0 ?
-                `<div class="alert alert-warning">Potential data leaks detected: ${data.response_analysis.potential_leaks.length}</div>` : ''}
+            `<div class="alert alert-warning">Potential data leaks detected: ${data.response_analysis.potential_leaks.length}</div>` : ''}
             ${data.tool_calls_made && data.tool_calls_made.length > 0 ?
-                `<div><strong>Tools Used:</strong> ${data.tool_calls_made.join(', ')}</div>` : ''}
+            `<div><strong>Tools Used:</strong> ${data.tool_calls_made.join(', ')}</div>` : ''}
         `;
     }
 }
@@ -324,10 +324,14 @@ function updateSessionStatus(data) {
 // Get badge class for security stance
 function getStanceBadgeClass(stance) {
     switch (stance) {
-        case 'secure': return 'badge-success';
-        case 'cautious': return 'badge-warning';
-        case 'compromised': return 'badge-danger';
-        default: return 'badge-secondary';
+        case 'secure':
+            return 'badge-success';
+        case 'cautious':
+            return 'badge-warning';
+        case 'compromised':
+            return 'badge-danger';
+        default:
+            return 'badge-secondary';
     }
 }
 
@@ -363,12 +367,71 @@ function renderSessionsTable() {
             </td>
             <td>
                 <button class="btn btn-secondary" onclick="viewSessionDetails('${session.session_id}')">
-                    View Details
+                    View
+                </button>
+                <button class="btn btn-primary" style="margin-left: 6px;" onclick="resumeSession('${session.session_id}')">
+                    Resume
                 </button>
             </td>
         `;
         tbody.appendChild(row);
     });
+}
+
+async function resumeSession(sessionId) {
+    try {
+        const res = await fetch(`${API_BASE}/resume_session`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId })
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        showAlert(data.message || 'Session resumed', 'success');
+
+        // Set global session ID
+        currentSession = sessionId;
+
+        // Load session details from DB
+        const detailsRes = await fetch(`${API_BASE}/session/${sessionId}`);
+        const detailsData = await detailsRes.json();
+        const session = detailsData.session;
+        const interactions = detailsData.interactions;
+
+        // Switch to Active Research tab
+        document.querySelector('[data-tab="research"]').click();
+
+        // Show chat interface
+        document.getElementById('sessionDetails').style.display = 'block';
+        document.getElementById('chatSection').style.display = 'block';
+        document.getElementById('sessionSubtitle').textContent =
+            `Session: ${sessionId.substring(0, 8)}... | Challenge: ${data.challenge.name}`;
+
+        // Rebuild chat messages
+        const chatMessages = document.getElementById('chatMessages');
+        chatMessages.innerHTML = '';
+
+        interactions.forEach((interaction, index) => {
+            addMessage('user', interaction.user_input);
+            addMessage('ai', interaction.ai_response, {
+                sequence: interaction.sequence_number,
+                techniques: interaction.injection_techniques || [],
+                analysis: interaction.response_analysis,
+                toolCalls: (interaction.tool_calls || []).map(t => t.tool)
+            });
+        });
+
+        // Enable input
+        document.getElementById('messageInput').disabled = false;
+        document.getElementById('sendBtn').disabled = false;
+        document.getElementById('messageInput').focus();
+
+    } catch (err) {
+        console.error('Failed to resume session:', err);
+        showAlert('Failed to resume session', 'danger');
+    }
 }
 
 // Enhanced session loading for analysis
@@ -434,8 +497,8 @@ async function generateAnalysis() {
 
         const response = await fetch(`${API_BASE}/analyze_session`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId })
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({session_id: sessionId})
         });
 
         const analysis = await response.json();
@@ -473,13 +536,13 @@ function renderConversationView() {
         );
 
         messageElement.innerHTML = `
-            <div class="message-header">
-                <span class="message-role">${message.role}</span>
-                <span class="message-timestamp">${formatTimestamp(message.timestamp)}</span>
-            </div>
-            <div class="message-content">${highlightContent(message.content, highlight, interaction)}</div>
-            ${renderMessageMetadata(message, interaction)}
-        `;
+                <div class="message-header">
+                    <span class="message-role">${message.role}</span>
+                    <span class="message-timestamp">${formatTimestamp(message.timestamp)}</span>
+                </div>
+                <div class="message-content">${highlightContent(message.content, highlight, interaction)}</div>
+                ${renderMessageMetadata(message, interaction)}
+            `;
 
         viewer.appendChild(messageElement);
     });
@@ -512,7 +575,8 @@ function shouldShowMessage(message, filter, index) {
 
 // Highlight content based on mode
 function highlightContent(content, mode, interaction) {
-    let highlighted = content;
+    let markdownHTML = DOMPurify.sanitize(marked.parse(content));
+    let highlighted = markdownHTML;
 
     switch (mode) {
         case 'techniques':
@@ -845,9 +909,9 @@ function displayToolsSection(analysis) {
         <div class="sequence-info">
             <strong>Tool Call Sequence:</strong><br>
             <div class="tool-sequence">
-                ${toolProgression.map((tool, index) => 
-                    `<span class="sequence-item">${index + 1}. ${tool}</span>`
-                ).join('')}
+                ${toolProgression.map((tool, index) =>
+        `<span class="sequence-item">${index + 1}. ${tool}</span>`
+    ).join('')}
             </div>
         </div>
         <div class="sequence-patterns">
@@ -867,7 +931,7 @@ function analyzeToolPatterns(progression) {
     }
 
     const sortedPatterns = Object.entries(patterns)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 5);
 
     return sortedPatterns.map(([pattern, count]) =>
@@ -939,12 +1003,18 @@ function displayRiskAssessmentSection(analysis) {
 // Get badge class for risk level
 function getRiskBadgeClass(riskLevel) {
     switch (riskLevel) {
-        case 'CRITICAL': return 'badge-danger';
-        case 'HIGH': return 'badge-danger';
-        case 'MEDIUM': return 'badge-warning';
-        case 'LOW': return 'badge-warning';
-        case 'MINIMAL': return 'badge-success';
-        default: return 'badge-secondary';
+        case 'CRITICAL':
+            return 'badge-danger';
+        case 'HIGH':
+            return 'badge-danger';
+        case 'MEDIUM':
+            return 'badge-warning';
+        case 'LOW':
+            return 'badge-warning';
+        case 'MINIMAL':
+            return 'badge-success';
+        default:
+            return 'badge-secondary';
     }
 }
 
@@ -984,7 +1054,7 @@ function exportConversation() {
     });
 
     // Create and download file
-    const blob = new Blob([exportText], { type: 'text/plain' });
+    const blob = new Blob([exportText], {type: 'text/plain'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

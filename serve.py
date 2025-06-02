@@ -46,7 +46,7 @@ class SPARequestHandler(http.server.SimpleHTTPRequestHandler):
         return f
 
 Handler = SPARequestHandler
-with socketserver.TCPServer(("", PORT), Handler) as httpd:
+with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
     print(f"Serving at http://localhost:{PORT}")
     print("Press Ctrl+C to stop.")
     try:
