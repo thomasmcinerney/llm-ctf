@@ -407,7 +407,7 @@ async function resumeSession(sessionId) {
         document.getElementById('sessionDetails').style.display = 'block';
         document.getElementById('chatSection').style.display = 'block';
         document.getElementById('sessionSubtitle').textContent =
-            `Session: ${sessionId.substring(0, 8)}... | Challenge: ${data.challenge.name}`;
+            `Session: ${sessionId.substring(0, 8)}... | Challenge: ${session.challenge.name}`;
 
         // Rebuild chat messages
         const chatMessages = document.getElementById('chatMessages');
